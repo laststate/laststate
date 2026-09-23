@@ -1,17 +1,8 @@
-# Re-vendor upstream component snapshots at new pins.
-# Usage: pwsh -File scripts/update.ps1 [-TraceRef main] [-RelayRef main] [-BillingRef main] [-SimRef main]
-param([string]$TraceRef = "main", [string]$RelayRef = "main", [string]$BillingRef = "main", [string]$SimRef = "main")
+# Move each submodule to the tip of its tracked branch (main),
+# so COMPONENTS.md can be refreshed after a test boot.
+# Usage: pwsh -File scripts/update.ps1
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
-function Clone-Vendor($dir, $url, $ref) {
-  if (Test-Path "$dir.tmp") { Remove-Item -Recurse -Force "$dir.tmp" }
-  git clone --depth 1 --branch $ref $url "$dir.tmp"
-  Remove-Item -Recurse -Force "$dir.tmp/.git"
-  if (Test-Path $dir) { Remove-Item -Recurse -Force $dir }
-  Rename-Item "$dir.tmp" $dir
-}
-Clone-Vendor "trace" "https://github.com/laststate/trace.git" $TraceRef
-Clone-Vendor "relay" "https://github.com/laststate/relay.git" $RelayRef
-Clone-Vendor "billing-service" "https://github.com/laststate/billing-service.git" $BillingRef
-Clone-Vendor "simulator" "https://github.com/laststate/simulator.git" $SimRef
-Write-Output "Vendored. Record SHAs in COMPONENTS.md and commit."
+git submodule update --remote --merge trace relay billing-service simulator
+git submodule status
+Write-Output "Boot the stack, run scripts/smoke.ps1, then commit the new pins."

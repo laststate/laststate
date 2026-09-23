@@ -4,7 +4,7 @@
 .env.*.local
 *.env
 
-# Runtime data (compose uses named volumes; local binds may appear)
+# Compose runtime (named volumes hold this; local binds may appear)
 pgdata/
 tracedata/
 relay-data/
@@ -19,7 +19,7 @@ quarantine/
 *.db-shm
 *.db-wal
 
-# Build artifacts
+# Local build leftovers outside submodules
 /bin/
 /dist/
 *.exe
@@ -30,11 +30,6 @@ coverage.out
 .next/
 out/
 build/
-trace/web/dist/
-trace/web/node_modules/
-relay/bin/
-billing-service/bin/
-simulator/bin/
 
 # OS / IDE
 .DS_Store

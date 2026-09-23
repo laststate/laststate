@@ -1,8 +1,9 @@
 # LastState Platform — one-command distribution
 # Usage:
-#   git clone https://github.com/laststate/laststate.git
+#   git clone --recurse-submodules https://github.com/laststate/laststate.git
 #   cd laststate
 #   docker compose up -d
+# (without --recurse-submodules: git submodule update --init --recursive)
 #
 # URLs:
 #   UI         → http://localhost:8080
@@ -15,7 +16,7 @@
 # In production inject via Vault/SSM/Doppler. Generate with:
 #   openssl rand -hex 32  /  openssl rand -base64 32
 #
-# Component sources are vendored under ./trace, ./relay,
+# Component sources are git submodules under ./trace, ./relay,
 # ./billing-service, ./simulator (see COMPONENTS.md for pins).
 # Each service has `image: ghcr.io/laststate/...` + `build:` so
 # `docker compose up -d` pulls published images when available

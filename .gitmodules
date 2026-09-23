@@ -1,0 +1,16 @@
+[submodule "relay"]
+	path = relay
+	url = https://github.com/laststate/relay.git
+	branch = main
+[submodule "trace"]
+	path = trace
+	url = https://github.com/laststate/trace.git
+	branch = main
+[submodule "billing-service"]
+	path = billing-service
+	url = https://github.com/laststate/billing-service.git
+	branch = main
+[submodule "simulator"]
+	path = simulator
+	url = https://github.com/laststate/simulator.git
+	branch = main
