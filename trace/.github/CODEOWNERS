@@ -1,0 +1,13 @@
+# Trace Platform Code Owners
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default: trace team owns everything
+* @laststate/trace-team
+
+# Domain-specific owners
+/cmd/                    @laststate/trace-core
+/internal/api/           @laststate/trace-api
+/internal/worker/        @laststate/trace-worker
+/internal/analytics/     @laststate/trace-analytics
+/deploy/                 @laststate/infra-team
+docs/                    @laststate/docs

@@ -1,0 +1,18 @@
+# Binaries
+*.exe
+*.exe~
+*.test
+*.out
+simulator
+/bin/
+/dist/
+
+# Local env (see .env.example — never commit real tokens)
+.env
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

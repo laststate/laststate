@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-worker
+spec:
+  replicas: {{ .Values.replicaCount.worker }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-worker
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-worker
+    spec:
+      containers:
+        - name: trace
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          env:
+            - name: TRACE_MODE
+              value: "worker"
+            - name: TRACE_WORKERS
+              value: "2"
+            - name: TRACE_BOOTSTRAP
+              value: "false"
+            - name: TRACE_ENABLE_RETENTION
+              value: {{ .Values.env.TRACE_ENABLE_RETENTION | quote }}
+            - name: TRACE_RETENTION_DAYS
+              value: {{ .Values.env.TRACE_RETENTION_DAYS | quote }}
+            - name: TRACE_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: databaseUrl
+          resources:
+            {{- toYaml .Values.resources.worker | nindent 12 }}

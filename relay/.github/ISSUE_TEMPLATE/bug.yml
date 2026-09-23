@@ -1,0 +1,71 @@
+name: Bug report
+description: Report incorrect behavior in collection, delivery, or persistence.
+title: "[Bug]: "
+labels:
+  - bug
+  - triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Relay. Never include device keys, private endpoints, customer memory, or exploit details here. Use private vulnerability reporting for sensitive reports.
+  - type: input
+    id: version
+    attributes:
+      label: Relay version or commit
+      placeholder: v0.3.0 or a full commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected component
+      options:
+        - LEP parsing / framing
+        - Source (serial, TCP, HTTP, MQTT, directory, adapter)
+        - Delivery (Trace, mirror, priority, route)
+        - Spool / persistence
+        - Admin API
+        - Crypto / auth
+        - CLI / TUI
+        - Packaging / Docker
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened?
+      description: Describe the observed result and its impact.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: List exact commands, configuration, and steps.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Add logs, result codes, or register summaries only after removing identifiers and sensitive memory.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues for the same behavior.
+          required: true
+        - label: This report contains no secrets, customer memory, or private firmware.
+          required: true
+        - label: I can help test a fix on the target described above.
+          required: false

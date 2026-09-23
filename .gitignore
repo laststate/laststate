@@ -1,0 +1,51 @@
+# LastState distribution - never commit real secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Runtime data (compose uses named volumes; local binds may appear)
+pgdata/
+tracedata/
+relay-data/
+miniodata/
+promdata/
+grafanadata/
+data/
+inbox/
+imported/
+quarantine/
+*.db
+*.db-shm
+*.db-wal
+
+# Build artifacts
+/bin/
+/dist/
+*.exe
+*.exe~
+*.test
+*.out
+coverage.out
+.next/
+out/
+build/
+trace/web/dist/
+trace/web/node_modules/
+relay/bin/
+billing-service/bin/
+simulator/bin/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Tooling caches
+.mypy_cache/
+.pytest_cache/
+__pycache__/
+node_modules/

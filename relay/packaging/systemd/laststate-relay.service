@@ -1,0 +1,24 @@
+[Unit]
+Description=Last State Relay offline-first embedded diagnostics gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=laststate
+Group=laststate
+ExecStart=/usr/local/bin/laststate-relay run --config /etc/laststate/relay.yaml
+Restart=on-failure
+RestartSec=5s
+StateDirectory=laststate
+ConfigurationDirectory=laststate
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/laststate
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Integration questions and design ideas
+    url: https://github.com/laststate/billing-service/discussions
+    about: Start a discussion for billing integration questions or design proposals.
+  - name: Security vulnerabilities
+    url: https://github.com/laststate/billing-service/security/advisories/new
+    about: Report security issues privately.

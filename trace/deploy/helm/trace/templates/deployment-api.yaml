@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-api
+spec:
+  replicas: {{ .Values.replicaCount.api }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-api
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-api
+    spec:
+      containers:
+        - name: trace
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: TRACE_MODE
+              value: "api"
+            - name: TRACE_OPEN_UI
+              value: {{ .Values.env.TRACE_OPEN_UI | quote }}
+            - name: TRACE_ENV
+              value: {{ .Values.env.TRACE_ENV | quote }}
+            - name: TRACE_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: databaseUrl
+            - name: TRACE_VERSION
+              value: {{ .Values.env.TRACE_VERSION | default "0.8.0" | quote }}
+            - name: TRACE_ALLOW_PUBLIC_REGISTER
+              value: {{ .Values.env.TRACE_ALLOW_PUBLIC_REGISTER | default "false" | quote }}
+            - name: TRACE_OIDC_AUTO_JOIN
+              value: {{ .Values.env.TRACE_OIDC_AUTO_JOIN | default "false" | quote }}
+            - name: TRACE_SAML_INSECURE
+              value: {{ .Values.env.TRACE_SAML_INSECURE | default "false" | quote }}
+            - name: TRACE_QUEUE
+              value: {{ .Values.env.TRACE_QUEUE | default "postgres" | quote }}
+            - name: TRACE_TRUSTED_PROXIES
+              value: {{ .Values.env.TRACE_TRUSTED_PROXIES | default "" | quote }}
+            - name: TRACE_SECRETS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: secretsKey
+                  optional: true
+          readinessProbe:
+            httpGet: { path: /health/ready, port: 8080 }
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet: { path: /health/live, port: 8080 }
+          resources:
+            {{- toYaml .Values.resources.api | nindent 12 }}

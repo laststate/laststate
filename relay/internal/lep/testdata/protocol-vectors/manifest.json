@@ -1,0 +1,120 @@
+{
+  "name": "lep-v2",
+  "version": "2",
+  "accepted_versions": [1, 2],
+  "keys": [
+    {
+      "id": "envelope-test-key",
+      "key_id": 1,
+      "hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "note": "Test-only AEAD key; reproduces the crypto/aead-xchacha-v*.hex goldens."
+    },
+    {
+      "id": "auth-test-key",
+      "key_id": 1,
+      "hex": "2b7e151628aed2a6abf7158809cf4f3c2b7e151628aed2a6abf7158809cf4f3c",
+      "note": "Test-only HMAC key; reproduces the crypto/hmac-auth-only-v*.hex goldens."
+    }
+  ],
+  "vectors": [
+    {
+      "id": "valid-v1-basic",
+      "path": "valid/lep-v1-basic.hex",
+      "kind": "valid",
+      "version": 1
+    },
+    {
+      "id": "valid-v2-basic",
+      "path": "valid/lep-v2-basic.hex",
+      "kind": "valid",
+      "version": 2
+    },
+    {
+      "id": "valid-latch-platform-contexts",
+      "path": "valid/latch-platform-contexts.hex",
+      "kind": "valid"
+    },
+    {
+      "id": "valid-latch-cpu64-complete",
+      "path": "valid/latch-cpu64-complete.hex",
+      "kind": "valid"
+    },
+    {
+      "id": "crypto-aead-v1",
+      "path": "crypto/aead-xchacha-v1.hex",
+      "kind": "crypto-aead",
+      "version": 1,
+      "key": "envelope-test-key"
+    },
+    {
+      "id": "crypto-aead-v2",
+      "path": "crypto/aead-xchacha-v2.hex",
+      "kind": "crypto-aead",
+      "version": 2,
+      "key": "envelope-test-key"
+    },
+    {
+      "id": "crypto-hmac-v1",
+      "path": "crypto/hmac-auth-only-v1.hex",
+      "kind": "crypto-hmac",
+      "version": 1,
+      "key": "auth-test-key"
+    },
+    {
+      "id": "crypto-hmac-v2",
+      "path": "crypto/hmac-auth-only-v2.hex",
+      "kind": "crypto-hmac",
+      "version": 2,
+      "key": "auth-test-key"
+    },
+    {
+      "id": "transport-stream-v1",
+      "path": "transports/latch-stream-basic-v1.hex",
+      "kind": "stream",
+      "version": 1
+    },
+    {
+      "id": "transport-stream-v2",
+      "path": "transports/latch-stream-basic-v2.hex",
+      "kind": "stream",
+      "version": 2
+    },
+    {
+      "id": "transport-lsak-ack-stored",
+      "path": "transports/lsak-ack-stored.hex",
+      "kind": "lsak",
+      "event_id": 9,
+      "status": 1
+    },
+    {
+      "id": "invalid-magic",
+      "path": "invalid/bad-magic.hex",
+      "kind": "invalid"
+    },
+    {
+      "id": "invalid-header-crc",
+      "path": "invalid/bad-header-crc.hex",
+      "kind": "invalid"
+    },
+    {
+      "id": "invalid-payload-crc",
+      "path": "invalid/bad-payload-crc.hex",
+      "kind": "invalid"
+    },
+    {
+      "id": "invalid-tlv-zero",
+      "path": "invalid/tlv-type-zero.hex",
+      "kind": "invalid"
+    },
+    {
+      "id": "invalid-version",
+      "path": "invalid/unsupported-version.hex",
+      "kind": "invalid"
+    },
+    {
+      "id": "invalid-flags",
+      "path": "invalid/unknown-flags.hex",
+      "kind": "invalid"
+    }
+  ]
+}

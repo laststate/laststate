@@ -1,0 +1,31 @@
+openapi: 3.1.0
+info:
+  title: Last State Relay Admin API
+  version: 1.0.0
+paths:
+  /v1/status:
+    get:
+      responses:
+        '200': {description: Relay status}
+  /v1/health:
+    get:
+      responses:
+        '200': {description: Healthy}
+        '503': {description: Unhealthy}
+  /v1/events:
+    get:
+      responses:
+        '200': {description: Recent events}
+  /v1/events/{id}:
+    get:
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: string}}
+      responses:
+        '200': {description: Raw LEP envelope}
+        '404': {description: Event not found}
+  /v1/events/{id}/replay:
+    post:
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: string}}
+      responses:
+        '202': {description: Requeued}

@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "billing-service.fullname" . }}
+  labels:
+    {{- include "billing-service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "billing-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "billing-service.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.config.port }}
+              protocol: TCP
+          env:
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "billing-service.fullname" . }}-secret
+                  key: DB_URL
+            - name: TRACE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "billing-service.fullname" . }}-config
+                  key: TRACE_URL
+            - name: STRIPE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "billing-service.fullname" . }}-secret
+                  key: STRIPE_KEY
+            - name: MP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "billing-service.fullname" . }}-secret
+                  key: MP_KEY
+            - name: CRYPTO_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "billing-service.fullname" . }}-secret
+                  key: CRYPTO_KEY
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "billing-service.fullname" . }}-secret
+                  key: STRIPE_WEBHOOK_SECRET
+            - name: MP_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "billing-service.fullname" . }}-secret
+                  key: MP_WEBHOOK_SECRET
+            - name: CRYPTO_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "billing-service.fullname" . }}-secret
+                  key: CRYPTO_WEBHOOK_SECRET
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

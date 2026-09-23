@@ -1,0 +1,44 @@
+name: Feature or design proposal
+description: Propose a new capability or architectural change.
+title: "[Proposal]: "
+labels:
+  - enhancement
+  - triage
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What operational gap, missing transport, or analysis need cannot be handled well today?
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Concrete use case
+      description: Include the deployment context, source type, and why current Relay capabilities are insufficient.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed direction
+      description: Describe the smallest useful change. API sketches and architecture diagrams are welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints and trade-offs
+      description: Consider durability guarantees, auth boundaries, resource bounds, cross-platform compatibility, and operator complexity.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to implement or test this proposal.
+        - label: This changes the persistence layout, delivery semantics, or auth model and should be discussed before implementation.

@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-backup
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: postgres:16-alpine
+              env:
+                - name: TRACE_DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Release.Name }}-secrets
+                      key: databaseUrl
+              volumeMounts:
+                - name: backup
+                  mountPath: /backups
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+                  STAMP=$(date +%Y%m%d)
+                  OUT=/backups/trace-$STAMP.dump
+                  pg_dump "$TRACE_DATABASE_URL" -Fc -f "$OUT"
+                  echo "backup written $OUT"
+                  # retain 14 days
+                  find /backups -name 'trace-*.dump' -mtime +14 -delete || true
+          volumes:
+            - name: backup
+              {{- if .Values.persistence.backup.enabled }}
+              persistentVolumeClaim:
+                claimName: {{ .Release.Name }}-backup
+              {{- else }}
+              emptyDir: {}
+              {{- end }}
+---
+{{- if .Values.persistence.backup.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-backup
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.backup.size | default "10Gi" }}
+  {{- if .Values.persistence.backup.storageClass }}
+  storageClassName: {{ .Values.persistence.backup.storageClass | quote }}
+  {{- end }}
+{{- end }}

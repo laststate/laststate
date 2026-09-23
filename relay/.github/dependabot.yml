@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-prs-limit: 5
+    labels:
+      - dependencies
+    assignees:
+      - dependabot[bot]
+    groups:
+      actions:
+        patterns:
+          - '*'
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-prs-limit: 10
+    labels:
+      - dependencies
+    assignees:
+      - dependabot[bot]
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect
+    versioning-strategy: increase
+    commit-message:
+      prefix: chore(deps)

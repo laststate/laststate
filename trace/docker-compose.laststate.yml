@@ -1,0 +1,65 @@
+# LastState — Self-hosted deployment
+# Run: laststate up / docker compose -f docker-compose.laststate.yml up -d
+
+services:
+  # PostgreSQL — Trace backend database
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: trace
+      POSTGRES_USER: trace
+      POSTGRES_PASSWORD: trace
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trace"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Trace — Observability backend (API + workers + UI)
+  trace:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      TRACE_MODE: all
+      TRACE_QUEUE: postgres
+      # NOTE: sslmode=disable is insecure for production. Use sslmode=verify-full with proper TLS in production.
+      TRACE_DB_URL: postgres://trace:trace@postgres:5432/trace?sslmode=disable
+      TRACE_OBJECT_DIR: /data/objects
+      TRACE_OPEN_UI: "true"
+      TRACE_ALLOW_PUBLIC_REGISTER: "false"
+      TRACE_OIDC_AUTO_JOIN: "false"
+      TRACE_SECRETS_KEY: ${TRACE_SECRETS_KEY:-changeme-secrets-key-32chars!!!}
+      TRACE_TRUSTED_PROXIES: ""
+    volumes:
+      - trace-data:/data
+      - ./laststate-data:/data/bootstrap:ro
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Relay — Offline-first gateway (optional, for device collection)
+  relay:
+    build:
+      context: ../relay
+      dockerfile: Dockerfile
+    environment:
+      RELAY_DATA_DIR: /data
+      RELAY_LOG_LEVEL: info
+    volumes:
+      - relay-data:/data
+    ports:
+      - "8081:8080"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  trace-data:
+  relay-data:

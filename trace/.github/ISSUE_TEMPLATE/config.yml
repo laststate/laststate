@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Feature requests and design ideas
+    url: https://github.com/laststate/trace/discussions
+    about: Start a discussion for new features or design proposals.
+  - name: Security vulnerabilities
+    url: https://github.com/laststate/trace/security/advisories/new
+    about: Report security issues privately.

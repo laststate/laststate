@@ -1,0 +1,119 @@
+version: 1
+
+instance:
+  id: auto
+  name: local-relay-prod-sim
+  data_dir: /var/lib/laststate
+
+sources:
+  - id: http-ingest
+    type: http
+    enabled: true
+    http:
+      listen: 0.0.0.0:8384
+      token: env:LASTSTATE_INGEST_TOKEN
+      max_body_bytes: 4194304
+      max_concurrent: 64
+      requests_per_second: 0
+      burst_size: 0
+      read_timeout: 15s
+      write_timeout: 30s
+      idle_timeout: 1m
+      tls:
+        enabled: false
+    framing:
+      type: raw
+    ack:
+      mode: none
+
+  - id: tcp-cobs
+    type: tcp
+    enabled: true
+    tcp:
+      listen: 0.0.0.0:8385
+      max_clients: 64
+      read_timeout: 5m
+      write_timeout: 10s
+      tls:
+        enabled: false
+    framing:
+      type: cobs
+      max_frame_bytes: 4194304
+    ack:
+      mode: lsak-v1
+      write_timeout: 5s
+
+  - id: udp-telemetry
+    type: udp
+    enabled: true
+    udp:
+      listen: 0.0.0.0:8386
+      max_datagram_bytes: 65536
+    framing:
+      type: raw
+    ack:
+      mode: none
+
+destinations:
+  - id: trace-local
+    type: trace
+    enabled: true
+    required: true
+    priority: 10
+    url: http://trace:8080
+    auth:
+      type: bearer
+      token: env:LASTSTATE_COMPANY_TOKEN
+    batch:
+      enabled: true
+      max_events: 50
+      max_bytes: 4194304
+      max_wait: 1s
+      prefer_binary: true
+      prefer_zstd: false
+
+delivery:
+  mode: mirror
+  concurrency: 4
+  retry:
+    min_delay: 1s
+    max_delay: 10s
+    multiplier: 2
+    jitter: true
+    max_attempts: 10
+  circuit_breaker:
+    failure_threshold: 5
+    open_for: 15s
+  routes: []
+
+spool:
+  max_bytes: 10737418240
+  min_free_bytes: 268435456
+  delivered_retention: 72h
+  pressure_policy: reject-new
+  fsync: full
+
+admin:
+  listen: 0.0.0.0:8383
+  token: env:LASTSTATE_ADMIN_TOKEN
+  read_timeout: 15s
+  write_timeout: 30s
+  idle_timeout: 1m
+  tls:
+    enabled: false
+
+metrics:
+  enabled: true
+  listen: 0.0.0.0:9467
+
+analysis:
+  enabled: true
+  symbol_cache_dir: /var/lib/laststate/symbol-cache
+
+crypto:
+  enabled: false
+  decrypt_on_ingest: false
+  allow_opaque_forward: true
+
+privacy:
+  preserve_raw_locally: true

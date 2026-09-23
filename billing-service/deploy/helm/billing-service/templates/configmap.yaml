@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "billing-service.fullname" . }}-config
+  labels:
+    {{- include "billing-service.labels" . | nindent 4 }}
+data:
+  DB_URL: {{ .Values.config.dbURL | quote }}
+  TRACE_URL: {{ .Values.config.traceURL | quote }}
+  PORT: {{ .Values.config.port | quote }}
+  # Secrets (STRIPE_KEY, MP_KEY, CRYPTO_KEY, *_WEBHOOK_SECRET) are intentionally
+  # NOT in the ConfigMap — they live only in the Secret (secret.yaml) to avoid
+  # plaintext exposure in etcd. See secret.yaml.

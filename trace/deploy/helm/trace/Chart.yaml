@@ -1,0 +1,6 @@
+apiVersion: v2
+name: trace
+description: Last State Trace observability backend
+type: application
+version: 0.8.0
+appVersion: "0.8.0"

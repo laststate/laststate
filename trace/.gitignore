@@ -1,0 +1,15 @@
+.DS_Store
+/data/
+/bin/
+/dist/
+*.exe
+*.test
+bootstrap-token.txt
+bootstrap-admin.txt
+web/node_modules/
+web/test-results/
+web/playwright-report/
+web/preview-shots/
+*.log
+/# migrations live under internal/db/migrations/ (embedded via go:embed)
+/migrations/

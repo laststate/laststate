@@ -1,0 +1,110 @@
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+
+linters:
+  default: none
+  enable:
+    - errcheck
+    - gosec
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+  settings:
+    errcheck:
+      check-blank: false
+      # Console output and best-effort builder writes have no recovery path.
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - (*strings.Builder).WriteString
+        - (*bytes.Buffer).Write
+        - (*bytes.Buffer).WriteByte
+        - (*bytes.Buffer).WriteRune
+        - (*bytes.Buffer).WriteString
+    govet:
+      enable:
+        - nilness
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - gosec
+      # Conversions of len() to fixed-width fields are bounded by validated
+      # payload limits (MaxFrameBytes, MaxBodyBytes); no overflow is reachable.
+      - linters:
+          - gosec
+        text: "G115:"
+      # math/rand powers delivery backoff jitter only; it is not used for
+      # secrets or nonces.
+      - linters:
+          - gosec
+        text: "G404:"
+      # leaseWhere is a constant fragment controlled by this package, never
+      # derived from input.
+      - linters:
+          - gosec
+        text: "G202:"
+      # Unhandled-error coverage is errcheck's job (enabled above with a
+      # stricter policy); G104 would only duplicate it on cleanup paths.
+      - linters:
+          - gosec
+        text: "G104:"
+      # Relay reads and writes files exclusively at operator-configured paths
+      # (spool store, artifact roots, secret file: refs, import/export); path
+      # traversal is bounded by the configuration itself.
+      - linters:
+          - gosec
+        text: "G304:"
+      - linters:
+          - gosec
+        text: "G703:"
+      - linters:
+          - gosec
+        text: "G122:"
+      # Shutdown paths intentionally derive a fresh context from
+      # context.Background(): the parent ctx is already canceled there.
+      - linters:
+          - gosec
+        text: "G118:"
+      # Admin endpoints serve stored payloads as application/octet-stream;
+      # there is no HTML rendering surface.
+      - linters:
+          - gosec
+        text: "G705:"
+      # "token"/"token_ref" are SQLite column names in DDL, not credentials.
+      - linters:
+          - gosec
+        text: "G101:"
+      # Close/Remove on shutdown and temp-file cleanup paths: nothing to do
+      # with the error at that point (process is exiting or rolling back).
+      - linters:
+          - errcheck
+        source: "^\\s*(defer )?_? ?=?.*\\.(Close)\\(\\)$"
+      - linters:
+          - errcheck
+        text: "Error return value of `os.Remove` is not checked"
+    paths:
+      - vendor
+      - migrations
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes:
+        - github.com/laststate/relay
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

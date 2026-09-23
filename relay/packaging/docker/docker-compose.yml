@@ -1,0 +1,16 @@
+services:
+  relay:
+    build:
+      context: ../..
+    image: laststate-relay:local
+    restart: unless-stopped
+    volumes:
+      - relay-data:/var/lib/laststate
+      - ./relay.yaml:/etc/laststate/relay.yaml:ro
+    ports:
+      - "8383:8383"
+      - "8384:8384"
+      - "9467:9467"
+
+volumes:
+  relay-data:

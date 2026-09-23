@@ -1,0 +1,13 @@
+# Default ownership keeps security-sensitive changes visible to the maintainer.
+* @TheusHen
+
+# Core pipeline changes require explicit owner review.
+/internal/lep/ @TheusHen
+/internal/delivery/ @TheusHen
+/internal/spool/ @TheusHen
+/internal/admin/ @TheusHen
+/internal/crypto/ @TheusHen
+/SECURITY.md @TheusHen
+
+# Supply-chain automation and disclosure policy require explicit owner review.
+/.github/workflows/ @TheusHen

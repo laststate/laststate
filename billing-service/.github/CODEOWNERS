@@ -1,0 +1,12 @@
+# Billing Service Code Owners
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default: billing team owns everything
+* @laststate/billing-team
+
+# Domain-specific owners
+/internal/billing/     @laststate/billing-core
+/internal/store/       @laststate/billing-core
+/internal/webhook/     @laststate/billing-core
+/deploy/               @laststate/infra-team
+docs/                  @laststate/docs

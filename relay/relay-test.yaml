@@ -1,0 +1,32 @@
+version: 1
+instance:
+  name: lab-relay
+  data_dir: ./data
+sources:
+  - id: stm32-uart
+    type: serial
+    enabled: false
+    serial:
+      device: COM5
+      baud: 115200
+      reconnect: true
+    framing:
+      type: latch-stream
+
+  - id: field-imports
+    type: directory
+    enabled: true
+    directory:
+      path: ./inbox
+      archive_path: ./imported
+
+destinations:
+  - id: trace-local
+    type: trace
+    enabled: false
+    url: http://127.0.0.1:8080
+    auth:
+      type: none
+
+admin:
+  listen: 127.0.0.1:8383

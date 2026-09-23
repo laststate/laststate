@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  billing-service:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_URL=postgres://billing:billing@postgres:5432/billing?sslmode=disable
+      - TRACE_URL=http://trace:8080
+      - STRIPE_KEY=${STRIPE_KEY}
+      - MP_KEY=${MP_KEY}
+      - CRYPTO_KEY=${CRYPTO_KEY}
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=billing
+      - POSTGRES_PASSWORD=billing
+      - POSTGRES_DB=billing
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

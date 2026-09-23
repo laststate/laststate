@@ -1,0 +1,242 @@
+# LastState Platform — one-command distribution
+# Usage:
+#   git clone https://github.com/laststate/laststate.git
+#   cd laststate
+#   docker compose up -d
+#
+# URLs:
+#   UI         → http://localhost:8080
+#   relay adm  → http://localhost:8383
+#   grafana    → http://localhost:3001  (admin/admin)
+#   prometheus → http://localhost:9090
+#
+# Secrets: NEVER hard-code production values here. All secrets use
+# ${VAR:-dev_default} and are overridden by .env (see .env.example).
+# In production inject via Vault/SSM/Doppler. Generate with:
+#   openssl rand -hex 32  /  openssl rand -base64 32
+#
+# Component sources are vendored under ./trace, ./relay,
+# ./billing-service, ./simulator (see COMPONENTS.md for pins).
+# Each service has `image: ghcr.io/laststate/...` + `build:` so
+# `docker compose up -d` pulls published images when available
+# and builds locally otherwise.
+
+services:
+  # ─── PostgreSQL ───
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-laststate}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-laststate}
+      POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_MULTIPLE_DATABASES:-trace,billing}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-multi-db.sh:/docker-entrypoint-initdb.d/init-multi-db.sh:ro
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U laststate"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  # ─── MinIO (S3-compatible object storage for Trace) ───
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio12345}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  createbucket:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 3;
+      mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-minio} ${MINIO_ROOT_PASSWORD:-minio12345};
+      mc mb -p local/${MINIO_BUCKET:-trace} || true;
+      exit 0;
+      "
+
+  # ─── Trace — Observability Backend (API + Workers + UI) ───
+  trace:
+    image: ghcr.io/laststate/trace:latest
+    build:
+      context: ./trace
+      dockerfile: Dockerfile
+    environment:
+      TRACE_MODE: ${TRACE_MODE:-all}
+      TRACE_QUEUE: ${TRACE_QUEUE:-postgres}
+      TRACE_DATABASE_URL: ${TRACE_DATABASE_URL:-postgres://laststate:laststate@postgres:5432/trace?sslmode=disable}
+      TRACE_OBJECT_DIR: /data/objects
+      TRACE_WEB_DIR: /app/web/dist
+      TRACE_BOOTSTRAP: "true"
+      TRACE_BOOTSTRAP_TOKEN: ${TRACE_BOOTSTRAP_TOKEN:-lst_ingest_devlocal123.fullsecrettokenforlocaldev1234567890}
+      TRACE_OPEN_UI: "true"
+      TRACE_ALLOW_PUBLIC_REGISTER: "true"
+      TRACE_ADMIN_EMAIL: ${TRACE_ADMIN_EMAIL:-admin@laststate.local}
+      TRACE_ADMIN_PASSWORD: ${TRACE_ADMIN_PASSWORD:-admin123}
+      TRACE_ENV: ${TRACE_ENV:-local}
+      TRACE_DEPLOYMENT: ${TRACE_DEPLOYMENT:-local}
+      TRACE_PUBLIC_URL: ${TRACE_PUBLIC_URL:-http://localhost:8080}
+      TRACE_S3_ENDPOINT: ${TRACE_S3_ENDPOINT:-http://minio:9000}
+      TRACE_S3_BUCKET: ${TRACE_S3_BUCKET:-trace}
+      TRACE_S3_REGION: ${TRACE_S3_REGION:-us-east-1}
+      TRACE_S3_ACCESS_KEY: ${TRACE_S3_ACCESS_KEY:-minio}
+      TRACE_S3_SECRET_KEY: ${TRACE_S3_SECRET_KEY:-minio12345}
+      TRACE_JWT_SECRET: ${TRACE_JWT_SECRET:-super-secret-jwt-key-for-local-dev-only-32chars!!}
+      TRACE_SECRETS_KEY: ${TRACE_SECRETS_KEY:-changeme-secrets-key-32chars-for-local!!!}
+      TRACE_LOG_LEVEL: "debug"
+      TRACE_ENABLE_RETENTION: "true"
+      TRACE_RETENTION_DAYS: "90"
+      TRACE_RATE_LIMIT_PER_MIN: "600"
+      TRACE_RATE_LIMIT_PER_IP: "64"
+      CHAOS_ENABLED: "false"
+      PUBLIC_CRASH_API: "true"
+      PUBLIC_API_RATE_LIMIT: "100"
+      SOUNDBOARD_ENABLED: "true"
+      SOUNDBOARD_VOLUME: "50"
+      DNA_DETECTION_THRESHOLD: "95"
+      FLEET_HEALTH_RECALC_INTERVAL_MIN: "15"
+      MEMORIAL_ENABLED: "true"
+      TRACE_METRICS_ENABLED: "true"
+      TRACE_CORS_ORIGINS: "http://localhost:5173,http://localhost:3000,http://localhost:8080"
+    volumes:
+      - tracedata:/data
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      createbucket:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # ─── Relay — Offline-first Gateway ───
+  relay:
+    image: ghcr.io/laststate/relay:latest
+    build:
+      context: ./relay
+      dockerfile: Dockerfile
+    environment:
+      RELAY_DATA_DIR: ${RELAY_DATA_DIR:-/var/lib/laststate}
+      RELAY_LOG_LEVEL: ${RELAY_LOG_LEVEL:-debug}
+      LASTSTATE_INGEST_TOKEN: ${LASTSTATE_INGEST_TOKEN:-dev-ingest-token-12345}
+      LASTSTATE_ADMIN_TOKEN: ${LASTSTATE_ADMIN_TOKEN:-dev-admin-token-12345}
+      LASTSTATE_COMPANY_TOKEN: ${LASTSTATE_COMPANY_TOKEN:-lst_ingest_devlocal123.fullsecrettokenforlocaldev1234567890}
+    volumes:
+      - relay-data:/var/lib/laststate
+      - ./relay-config.yaml:/etc/laststate/relay.yaml:ro
+    ports:
+      - "8383:8383"   # admin API
+      - "8384:8384"   # HTTP ingest
+      - "8385:8385"   # TCP ingest (COBS + LSAK)
+      - "8386:8386"   # UDP ingest (best effort)
+      - "9467:9467"   # metrics
+    depends_on:
+      - trace
+    restart: unless-stopped
+
+  # ─── Billing Service ───
+  billing:
+    image: ghcr.io/laststate/billing-service:latest
+    build:
+      context: ./billing-service
+      dockerfile: Dockerfile
+    environment:
+      DB_URL: ${DB_URL:-postgres://laststate:laststate@postgres:5432/billing?sslmode=disable}
+      TRACE_URL: ${TRACE_URL:-http://trace:8080}
+      STRIPE_KEY: ${STRIPE_KEY:-sk_test_fake_stripe_key_for_local_dev_only}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_fake_local_dev_only}
+      MP_KEY: ${MP_KEY:-APP_USR_fake_mercado_pago_key_for_local_dev}
+      MP_WEBHOOK_SECRET: ${MP_WEBHOOK_SECRET:-fake_mp_webhook_secret_local_dev}
+      CRYPTO_KEY: ${CRYPTO_KEY:-fake_crypto_key_for_local_dev}
+      CRYPTO_WEBHOOK_SECRET: ${CRYPTO_WEBHOOK_SECRET:-fake_crypto_webhook_secret_local_dev}
+      NOWPAYMENTS_KEY: ${NOWPAYMENTS_KEY:-fake_nowpayments_key_for_local_dev}
+      NOWPAYMENTS_IPN_SECRET: ${NOWPAYMENTS_IPN_SECRET:-fake_nowpayments_ipn_secret_local_dev}
+      BILLING_LOG_LEVEL: ${BILLING_LOG_LEVEL:-debug}
+      BILLING_PORT: ${BILLING_PORT:-8080}
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+      - trace
+    restart: unless-stopped
+
+  # ─── LEP Fleet Simulator — turns the whole platform on, end to end ───
+  simulator:
+    image: ghcr.io/laststate/simulator:latest
+    build:
+      context: ./simulator
+      dockerfile: Dockerfile
+    environment:
+      RELAY_URL: ${RELAY_URL:-http://relay:8384}
+      RELAY_TOKEN: ${RELAY_TOKEN:-dev-ingest-token-12345}
+      SIM_TCP_ADDR: ${SIM_TCP_ADDR:-relay:8385}
+      SIM_UDP_ADDR: ${SIM_UDP_ADDR:-relay:8386}
+      SIMULATOR_RATE: ${SIMULATOR_RATE:-4}
+      SIMULATOR_BATCH_SIZE: ${SIMULATOR_BATCH_SIZE:-5}
+      SIMULATOR_DEVICE_COUNT: ${SIMULATOR_DEVICE_COUNT:-5}
+      SIMULATOR_ERROR_RATE: ${SIMULATOR_ERROR_RATE:-0.35}
+      SIM_SCENARIO: ${SIM_SCENARIO:-demo}
+      SIM_METRICS_LISTEN: ${SIM_METRICS_LISTEN:-:9468}
+    ports:
+      - "9468:9468"                 # simulator Prometheus metrics
+    depends_on:
+      - relay
+    restart: unless-stopped
+
+  # ─── Prometheus (metrics) ───
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - promdata:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - trace
+      - relay
+      - billing
+
+  # ─── Grafana (dashboards) ───
+  grafana:
+    image: grafana/grafana:11.1.0
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_INSTALL_PLUGINS: ""
+    volumes:
+      - ./grafana/provisioning/datasources/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - grafanadata:/var/lib/grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  pgdata:
+  tracedata:
+  relay-data:
+  miniodata:
+  promdata:
+  grafanadata:

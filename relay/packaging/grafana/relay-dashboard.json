@@ -1,0 +1,44 @@
+{
+  "title": "Last State Relay",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Events",
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "targets": [{"expr": "laststate_relay_events", "legendFormat": "events"}]
+    },
+    {
+      "type": "stat",
+      "title": "Pending",
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "targets": [{"expr": "laststate_relay_pending", "legendFormat": "pending"}]
+    },
+    {
+      "type": "stat",
+      "title": "Delivered",
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "targets": [{"expr": "laststate_relay_delivered", "legendFormat": "delivered"}]
+    },
+    {
+      "type": "stat",
+      "title": "Dead letter",
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "targets": [{"expr": "laststate_relay_dead_letter", "legendFormat": "dead"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Spool bytes",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+      "targets": [{"expr": "laststate_relay_spool_bytes", "legendFormat": "spool"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Disk free bytes",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+      "targets": [{"expr": "laststate_relay_disk_free_bytes", "legendFormat": "free"}]
+    }
+  ]
+}

@@ -1,0 +1,333 @@
+/* Billing view styles */
+.billing-view {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.plan-card {
+  padding: 1.5rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.plan-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1);
+}
+
+.plan-active {
+  border-width: 2px;
+}
+
+.plan-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.plan-card .meta {
+  font-size: 0.85rem;
+}
+
+.plan-card ul {
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+.plan-card hr {
+  border: none;
+  border-top: 1px solid hsl(0 0% 12%);
+  margin: 1rem 0;
+}
+
+/* Landing page styles */
+.landing-page {
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+}
+
+.landing-hero {
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.landing-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.landing-brand-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.landing-hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0 0 1rem;
+}
+
+.landing-gradient {
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.landing-hero-sub {
+  font-size: 1.1rem;
+  color: hsl(0 0% 64%);
+  line-height: 1.6;
+  margin: 0 0 2rem;
+}
+
+.landing-hero-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.landing-hero-meta {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.landing-code-block {
+  background: hsl(0 0% 6%);
+  border: 1px solid hsl(0 0% 12%);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.landing-code-cta {
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+}
+
+.landing-section {
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.landing-section h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+}
+
+.landing-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.landing-feature {
+  padding: 1.5rem;
+  border: 1px solid hsl(0 0% 12%);
+  border-radius: 0.75rem;
+}
+
+.landing-feature h3 {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+
+.landing-feature p {
+  color: hsl(0 0% 64%);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.landing-stack {
+  background: hsl(0 0% 3%);
+  border-radius: 1rem;
+  padding: 3rem 2rem;
+}
+
+.landing-stack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.landing-stack-card {
+  padding: 1.5rem;
+  border: 1px solid hsl(0 0% 12%);
+  border-radius: 0.75rem;
+}
+
+.landing-stack-card h3 {
+  margin: 0 0 0.5rem;
+}
+
+.landing-stack-card p {
+  color: hsl(0 0% 64%);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.landing-stack-card a {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #8b5cf6;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.landing-stack-card a:hover {
+  text-decoration: underline;
+}
+
+.landing-stack-highlight {
+  border-color: hsl(262 70% 50%);
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.landing-pricing {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.landing-price-card {
+  padding: 1.5rem;
+  border: 1px solid hsl(0 0% 12%);
+  border-radius: 0.75rem;
+  text-align: center;
+}
+
+.landing-price-card h3 {
+  margin: 0 0 0.5rem;
+}
+
+.landing-price {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.landing-price-period {
+  font-size: 0.85rem;
+  color: hsl(0 0% 64%);
+  font-weight: 400;
+}
+
+.landing-price-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #8b5cf6;
+  color: white;
+  padding: 2px 12px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.landing-price-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+  line-height: 2;
+}
+
+.landing-price-card ul li::before {
+  content: "✓ ";
+  color: #22c55e;
+}
+
+.landing-price-highlight {
+  border-color: hsl(262 70% 50%);
+  background: rgba(139, 92, 246, 0.05);
+  position: relative;
+}
+
+.landing-cta {
+  text-align: center;
+}
+
+.landing-footer {
+  border-top: 1px solid hsl(0 0% 12%);
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.landing-footer-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 3rem;
+}
+
+.landing-footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.landing-footer-links h4 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: hsl(0 0% 64%);
+  margin: 0 0 0.75rem;
+}
+
+.landing-footer-links a {
+  display: block;
+  color: hsl(0 0% 80%);
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+}
+
+.landing-footer-links a:hover {
+  color: #8b5cf6;
+}
+
+.landing-footer-bottom {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid hsl(0 0% 12%);
+}
+
+@media (max-width: 768px) {
+  .landing-hero {
+    grid-template-columns: 1fr;
+    padding: 2rem 1rem;
+  }
+
+  .landing-hero-title {
+    font-size: 1.75rem;
+  }
+
+  .landing-footer-content {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-footer-links {
+    grid-template-columns: 1fr;
+  }
+}

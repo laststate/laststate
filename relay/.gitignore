@@ -1,0 +1,32 @@
+# Build output
+/bin/
+/dist/
+*.exe
+*.exe~
+*.test
+*.out
+
+# Runtime state
+/data/
+/inbox/
+/imported/
+/quarantine/
+relay.yaml
+*.db
+*.db-shm
+*.db-wal
+*.tmp
+.pending-*
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Coverage / profiling
+coverage.out
+*.pprof
+
+# Runtime fixture dumps at repo root only (keep internal/*/testdata for goldens)
+/testdata/

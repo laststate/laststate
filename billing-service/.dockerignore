@@ -1,0 +1,39 @@
+# Build artifacts
+bin/
+*.exe
+
+# Git
+.git
+.gitignore
+
+# Documentation (not needed in container)
+docs/
+
+# Development
+*.md
+CHANGELOG.md
+LICENSE
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test
+*_test.go
+
+# Docker
+Dockerfile
+docker-compose.yml
+docker-compose*.yml
+
+# Helm
+deploy/
+
+# Go test cache
+-race
+
+# OS
+.DS_Store
+Thumbs.db
