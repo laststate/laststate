@@ -114,6 +114,11 @@ services:
       MEMORIAL_ENABLED: "true"
       TRACE_METRICS_ENABLED: "true"
       TRACE_CORS_ORIGINS: "http://localhost:5173,http://localhost:3000,http://localhost:8080"
+      # Billing realtime (trace ← billing-service): entitlement sync + usage reports.
+      TRACE_BILLING_URL: ${TRACE_BILLING_URL:-http://billing:8080}
+      TRACE_BILLING_API_KEY: ${BILLING_API_KEY:-}
+      TRACE_BILLING_HMAC_SECRET: ${TRACE_BILLING_HMAC_SECRET:-}
+      TRACE_BILLING_ORG_ID: ${BILLING_ORG_ID:-}
     volumes:
       - tracedata:/data
     ports:
@@ -137,6 +142,10 @@ services:
       LASTSTATE_INGEST_TOKEN: ${LASTSTATE_INGEST_TOKEN:-dev-ingest-token-12345}
       LASTSTATE_ADMIN_TOKEN: ${LASTSTATE_ADMIN_TOKEN:-dev-admin-token-12345}
       LASTSTATE_COMPANY_TOKEN: ${LASTSTATE_COMPANY_TOKEN:-lst_ingest_devlocal123.fullsecrettokenforlocaldev1234567890}
+      # Billing realtime (relay → billing-service usage, cached tier).
+      BILLING_URL: ${BILLING_URL:-http://billing:8080}
+      BILLING_API_KEY: ${BILLING_API_KEY:-}
+      BILLING_ORG_ID: ${BILLING_ORG_ID:-}
     volumes:
       - relay-data:/var/lib/laststate
       - ./relay-config.yaml:/etc/laststate/relay.yaml:ro
@@ -169,6 +178,8 @@ services:
       NOWPAYMENTS_IPN_SECRET: ${NOWPAYMENTS_IPN_SECRET:-fake_nowpayments_ipn_secret_local_dev}
       BILLING_LOG_LEVEL: ${BILLING_LOG_LEVEL:-debug}
       BILLING_PORT: ${BILLING_PORT:-8080}
+      # Shared HMAC for trace admin API + v2 webhook receivers.
+      TRACE_BILLING_HMAC_SECRET: ${TRACE_BILLING_HMAC_SECRET:-}
     ports:
       - "8081:8080"
     depends_on:
@@ -193,6 +204,10 @@ services:
       SIMULATOR_ERROR_RATE: ${SIMULATOR_ERROR_RATE:-0.35}
       SIM_SCENARIO: ${SIM_SCENARIO:-demo}
       SIM_METRICS_LISTEN: ${SIM_METRICS_LISTEN:-:9468}
+      # Billing realtime (simulator → billing-service usage reports).
+      BILLING_URL: ${BILLING_URL:-http://billing:8080}
+      BILLING_API_KEY: ${BILLING_API_KEY:-}
+      BILLING_ORG_ID: ${BILLING_ORG_ID:-}
     ports:
       - "9468:9468"                 # simulator Prometheus metrics
     depends_on:
